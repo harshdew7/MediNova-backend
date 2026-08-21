@@ -5,14 +5,37 @@ from app.schemas.user import UserCreate
 from app.utils.security import hash_password, verify_password
 
 
-def get_user_by_email(db: Session, email: str) -> User | None:
-    return db.query(User).filter(User.email == email).first()
+def get_user_by_email(
+    db: Session,
+    email: str,
+) -> User | None:
+    return (
+        db.query(User)
+        .filter(User.email == email)
+        .first()
+    )
 
 
-def create_user(db: Session, user: UserCreate) -> User:
+def get_user_by_mobile(
+    db: Session,
+    mobile_number: str,
+) -> User | None:
+    return (
+        db.query(User)
+        .filter(User.mobile_number == mobile_number)
+        .first()
+    )
+
+
+def create_user(
+    db: Session,
+    user: UserCreate,
+    mobile_number: str | None = None,
+) -> User:
     db_user = User(
         full_name=user.full_name,
         email=user.email,
+        mobile_number=mobile_number,
         hashed_password=hash_password(user.password),
     )
 
@@ -33,7 +56,10 @@ def authenticate_user(
     if not user:
         return None
 
-    if not verify_password(password, user.hashed_password):
+    if not verify_password(
+        password,
+        user.hashed_password,
+    ):
         return None
 
     return user

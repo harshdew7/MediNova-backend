@@ -7,27 +7,25 @@ from alembic import context
 from app.core.config import settings
 from app.db.base import Base
 
-# Import your models here
+# Import all models so Alembic can detect them
 from app.models.user import User
+from app.models.consultation import Consultation
+from app.models.otp_verification import OTPVerification
 
 config = context.config
 
-# Use the DATABASE_URL from .env
 config.set_main_option(
     "sqlalchemy.url",
-    settings.DATABASE_URL.replace("%", "%%")
+    settings.DATABASE_URL.replace("%", "%%"),
 )
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# Metadata used by Alembic
 target_metadata = Base.metadata
 
 
 def run_migrations_offline() -> None:
-    """Run migrations in offline mode."""
-
     url = config.get_main_option("sqlalchemy.url")
 
     context.configure(
@@ -42,8 +40,6 @@ def run_migrations_offline() -> None:
 
 
 def run_migrations_online() -> None:
-    """Run migrations in online mode."""
-
     connectable = engine_from_config(
         config.get_section(config.config_ini_section, {}),
         prefix="sqlalchemy.",
